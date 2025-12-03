@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MANDO'TECH FACTURE PREMIUM — Générateur de Documents</title>
+  <meta name="description" content="MANDO'TECH FACTURE PREMIUM — Générateur de Factures, Devis et PDF" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <style>
+    /* ========================
+       RESET & VARIABLES PREMIUM
+    ======================== */
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --bg-card: #ffffff;
+      --text-primary: #212529;
+      --text-secondary: #495057;
+      --text-muted: #6c757d;
+      --accent: #007bff;
+      --accent-hover: #0056b3;
+      --accent-glow: 0 0 10px rgba(0, 123, 255, 0.2);
+      --border: #dee2e6;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --gradient-primary: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      --gradient-secondary: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: all 0.3s ease;
+      padding-bottom: 120px; /* Space for action bar */
+    }
+
+    /* ========================
+       INTRO SCREEN NEON PREMIUM
+    ======================== */
+    #intro-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      overflow: hidden;
+      z-index: 9999;
+    }
+
+    #intro-card {
+      position: relative;
+      z-index: 2;
+      perspective: 1200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #neon-wrap h1#neon-text {
+      font-size: clamp(2.5rem, 10vw, 5rem);
+      font-weight: 900;
+      color: #007bff;
+      text-transform: uppercase;
+      letter-spacing: 6px;
+      text-shadow:
+          0 0 10px #007bff,
+          0 0 20px #007bff,
+          0 0 40px #007bff,
+          0 0 80px #007bff;
+      animation: neonPulse 3s ease-in-out infinite alternate, neonFloat 8s ease-in-out forwards;
+      text-align: center;
+      padding: 0 2rem;
+      background: linear-gradient(45deg, #007bff, #0056b3, #007bff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Neon animations */
+    @keyframes neonPulse {
+      0% { opacity: 0.9; filter: brightness(1); }
+      100% { opacity: 1; filter: brightness(1.3); }
+    }
+    
+    @keyframes neonFloat {
+      0% { transform: translateY(50px) scale(0.8); opacity: 0; }
+      20% { opacity: 1; }
+      50% { transform: translateY(-20px) scale(1.05); }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    /* ========================
+       APP CONTAINER STYLES PREMIUM
+    ======================== */
+    #app {
+      display: none;
+      padding: 1rem;
+      background: var(--gradient-secondary);
+      min-height: 100vh;
+    }
+
+    #form-section,
+    #preview-section {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      color: var(--text-primary);
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    #form-section:hover,
+    #preview-section:hover {
+      box-shadow: 0 6px 20px rgba(0, 123, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    #form-section input,
+    #form-section select,
+    #form-section textarea {
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--text-primary);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    #form-section input:focus,
+    #form-section select:focus,
+    #form-section textarea:focus {
+      border-color: var(--accent);
+      box-shadow: var(--accent-glow);
+      background: rgba(255, 255, 255, 1);
+      transform: translateY(-1px);
+    }
+
+    #form-section button {
+      background: var(--gradient-primary);
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+    }
+
+    #form-section button:hover {
+      background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+    }
+
+    /* ========================
+       HEADER PREMIUM STYLES
+    ======================== */
+    .header-content {
+      background: var(--gradient-secondary);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    #logo-box {
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    /* ========================
+       COLOR PICKER STYLES PREMIUM
+    ======================== */
+    .color-picker-container {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    
+    .color-dropdown {
+      width: 100%;
+    }
+    
+    .color-dropdown .dropdown-menu {
+      padding: 0.75rem;
+      min-width: 200px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    
+    .color-option {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid var(--border);
+      margin-bottom: 0.5rem;
+      background: rgba(255, 255, 255, 0.8);
+    }
+    
+    .color-option:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--shadow);
+      border-color: var(--accent);
+    }
+    
+    .color-option.active {
+      border-color: var(--accent);
+      box-shadow: var(--accent-glow);
+      background: rgba(0, 123, 255, 0.1);
+    }
+    
+    .color-preview {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      border: 2px solid rgba(0,0,0,0.1);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    
+    .custom-color-input {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .custom-color-input input {
+      flex: 1;
+      min-width: 150px;
+      height: 40px;
+      border-radius: 8px;
+    }
+
+    /* ========================
+       PREMIUM BUTTON STYLES
+    ======================== */
+    .btn-premium {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-premium::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-premium:hover::before {
+      left: 100%;
+    }
+
+    .btn-premium:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+    }
+
+    .btn-outline-premium {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-premium:hover {
+      background: var(--accent);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: var(--accent-glow);
+    }
+
+    /* ========================
+       BOTTOM ACTION BAR PREMIUM
+    ======================== */
+    .action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      border-top: 2px solid var(--accent);
+      padding: 1rem;
+      z-index: 1000;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .action-buttons button {
+      flex: 1;
+      min-width: 120px;
+      max-width: 180px;
+      min-height: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    /* ========================
+       TEMPLATES & HISTORY PREMIUM
+    ======================== */
+    .templates-container,
+    .history-section,
+    .cloud-section {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .history-card {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .history-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: var(--accent-glow);
+    }
+
+    .template-btn {
+      min-width: 150px;
+      height: 50px;
+      font-weight: 500;
+    }
+
+    /* ========================
+       ONLINE STATUS INDICATORS
+    ======================== */
+    .status-indicators {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1000;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-weight: 500;
+      font-size: 0.75rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid;
+    }
+
+    /* ========================
+       RESPONSIVE PREMIUM
+    ======================== */
+    @media (max-width: 1200px) {
+      #app main {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem;
+      }
+      
+      #preview-section {
+        margin-top: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      #neon-wrap h1#neon-text {
+        font-size: 2.5rem;
+        letter-spacing: 3px;
+      }
+      
+      #app {
+        padding: 0.75rem;
+        margin-bottom: 100px;
+      }
+      
+      .header-content {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+      
+      #form-section,
+      #preview-section {
+        padding: 1rem;
+      }
+      
+      .action-bar {
+        padding: 0.75rem;
+      }
+      
+      .action-buttons button {
+        min-width: 100px;
+        font-size: 0.8rem;
+        padding: 8px 12px;
+        min-height: 45px;
+      }
+      
+      .status-indicators {
+        top: 10px;
+        left: 10px;
+      }
+      
+      .form-flex,
+      .form-grid {
+        flex-direction: column;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+      }
+      
+      .header-content .d-flex {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .header-content .text-end {
+        text-align: center !important;
+      }
+    }
+
+    @media (max-width: 576px) {
+      #neon-wrap h1#neon-text {
+        font-size: 2rem;
+      }
+      
+      .action-buttons {
+        flex-direction: row;
+        gap: 0.5rem;
+      }
+      
+      .action-buttons button {
+        width: auto;
+        max-width: none;
+        min-width: 90px;
+        font-size: 0.75rem;
+        padding: 6px 10px;
+      }
+      
+      .templates-container .d-flex {
+        flex-direction: column;
+      }
+      
+      .template-btn {
+        width: 100%;
+      }
+      
+      .custom-color-input {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .custom-color-input input {
+        min-width: 100%;
+      }
+      
+      .status-indicators {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 1rem;
+        justify-content: center;
+      }
+    }
+
+    /* ========================
+       UTILITY CLASSES PREMIUM
+    ======================== */
+    .text-highlight {
+      color: var(--accent);
+      font-weight: 600;
+      text-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+    }
+    
+    .bg-accent {
+      background: var(--gradient-primary);
+      color: #ffffff;
+    }
+    
+    .border-accent {
+      border-color: var(--accent);
+    }
+    
+    .glow-effect {
+      box-shadow: var(--accent-glow);
+    }
+    
+    .premium-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: all 0.3s ease;
+    }
+    
+    .premium-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 123, 255, 0.15);
+    }
+
+    /* Signature pad premium */
+    #signature-pad {
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: var(--accent-glow);
+      max-width: 100%;
+    }
+
+    /* Table styles premium */
+    #preview-section table {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #preview-section table th {
+      background: var(--gradient-primary);
+      color: white;
+      font-weight: 600;
+      border: none;
+    }
+
+    #preview-section table td {
+      border-color: var(--border);
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    /* Responsive table */
+    @media (max-width: 768px) {
+      #items-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      
+      #preview-items {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+    
+    /* Logo styles without borders */
+    .logo-no-border {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       INTRO 3D NEON PREMIUM
+     ========================= -->
+  <div id="intro-screen" role="dialog" aria-label="Introduction MANDO'TECH FACTURE PREMIUM">
+    <!-- neon 3D text container -->
+    <div id="intro-card">
+      <div id="neon-wrap" aria-hidden="false">
+        <h1 id="neon-text">
+          MANDO'TECH PREMIUM
+        </h1>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================
+       MAIN APPLICATION PREMIUM
+     ========================= -->
+  <div class="container" id="app" aria-hidden="true">
+
+    <!-- Status Indicators -->
+    <div class="status-indicators">
+      <div id="online-status" class="status-badge bg-success">🟢 En ligne</div>
+      <div id="sync-status" class="status-badge bg-info">✓ Synchronisé</div>
+    </div>
+
+    <header class="header-content d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex align-items-center gap-4 flex-wrap">
+        <div id="logo-box" class="rounded overflow-hidden d-flex align-items-center justify-content-center" style="width:70px;height:70px;">
+          <img id="logo-preview" src="mando.png" alt="Logo MANDO'TECH" class="img-fluid logo-no-border">
+        </div>
+        <div>
+          <h1 class="mb-1 text-highlight">MANDO'TECH FACTURE PREMIUM</h1>
+          <small class="text-muted">Factures • Devis • Reçus • Multi-devises • Synchronisation Cloud</small>
+        </div>
+      </div>
+      <div class="text-end">
+        <div class="text-highlight fw-bold">MANDO'TECH</div>
+        <small class="text-muted">Application développée pour MAND'OPTIQUE</small><br>
+        <small class="text-muted">© 2024 MANDO'TECH - Tous droits réservés</small>
+      </div>
+    </header>
+
+    <!-- Color Customization Section -->
+    <section class="color-picker-container">
+      <h4 class="text-highlight mb-3">🎨 Personnalisation Premium</h4>
+      <p class="text-muted mb-4">Choisissez une palette de couleurs exclusive pour votre expérience premium</p>
+      
+      <div class="dropdown color-dropdown">
+        <button class="btn btn-premium dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+          <span>🎭 Sélectionner un thème premium</span>
+        </button>
+        <div class="dropdown-menu w-100">
+          <div class="color-option active" data-theme="light">
+            <div class="color-preview" style="background: #ffffff;"></div>
+            <span>☀️ Clair</span>
+          </div>
+          <div class="color-option" data-theme="blue">
+            <div class="color-preview" style="background: #0ea5e9;"></div>
+            <span>🌊 Océan Profond</span>
+          </div>
+          <div class="color-option" data-theme="purple">
+            <div class="color-preview" style="background: #8b5cf6;"></div>
+            <span>🔮 Violet Mystique</span>
+          </div>
+          <div class="color-option" data-theme="green">
+            <div class="color-preview" style="background: #10b981;"></div>
+            <span>🌿 Émeraude</span>
+          </div>
+          <div class="color-option" data-theme="warm">
+            <div class="color-preview" style="background: #f59e0b;"></div>
+            <span>🔥 Ambre Doré</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-4">
+        <label for="custom-color" class="fw-bold">🎨 Ou créez votre couleur exclusive :</label>
+        <div class="custom-color-input">
+          <input type="color" id="custom-color" class="form-control" value="#007bff">
+          <button id="apply-custom-color" class="btn btn-premium">✨ Appliquer</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Predefined Templates Section -->
+    <section class="templates-container">
+      <h4 class="text-highlight mb-4">📁 Modèles Pré-définis Premium</h4>
+      <div class="d-flex gap-3 flex-wrap">
+        <button class="btn btn-premium template-btn" data-template="invoice_web">
+          🌐 Facture Services Web
+        </button>
+        <button class="btn btn-premium template-btn" data-template="quote_consulting">
+          💼 Devis Conseil
+        </button>
+        <button class="btn btn-premium template-btn" data-template="receipt_standard">
+          ✅ Reçu de Paiement
+        </button>
+        <button class="btn btn-outline-premium" id="btn-save-template">
+          💾 Sauvegarder comme modèle
+        </button>
+      </div>
+    </section>
+
+    <main class="d-grid" style="grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
+
+      <!-- ======= PREMIUM FORM (LEFT) ======= -->
+      <section id="form-section" class="premium-card">
+        <h3 class="text-highlight mb-4">📄 Détails du Document Premium</h3>
+
+        <div class="form-flex d-flex gap-3 flex-wrap mb-4">
+          <div class="flex-grow-1" style="min-width:200px;">
+            <label for="doc-type" class="fw-bold">Type de Document</label>
+            <select id="doc-type" class="form-control" aria-label="Type de document">
+              <option value="Facture">🧾 Facture</option>
+              <option value="Devis">📋 Devis</option>
+              <option value="Reçu">✅ Reçu</option>
+            </select>
+          </div>
+
+          <div style="min-width:150px;">
+            <label for="doc-number" class="fw-bold">Numéro</label>
+            <input id="doc-number" class="form-control" type="text" value="MOP-2024-001" />
+          </div>
+
+          <div style="min-width:180px;">
+            <label for="doc-date" class="fw-bold">Date</label>
+            <input id="doc-date" class="form-control" type="date" />
+          </div>
+        </div>
+
+        <!-- MAND'OPTIQUE pre-filled information -->
+        <div class="form-grid d-grid mb-4" style="grid-template-columns:1fr 1fr;gap:1.5rem;">
+          <fieldset class="border rounded p-3" style="border-color: var(--accent) !important;">
+            <legend class="text-highlight fw-bold">🏢 MAND'OPTIQUE (Votre Entreprise)</legend>
+            <div class="mb-3">
+              <input id="from-name" class="form-control" value="MAND'OPTIQUE" readonly style="background: rgba(0, 123, 255, 0.1);" />
+            </div>
+            <div class="mb-3">
+              <input id="from-address" class="form-control" value="Local 7, Galerie Présidentielle, GOMBE - KINSHASA" readonly style="background: rgba(0, 123, 255, 0.1);" />
+            </div>
+            <div>
+              <input id="from-contact" class="form-control" value="+243824796844, +243851729059 • www.mandoptique.com" readonly style="background: rgba(0, 123, 255, 0.1);" />
+            </div>
+          </fieldset>
+
+          <fieldset class="border rounded p-3">
+            <legend class="text-highlight fw-bold">👤 Client</legend>
+            <div class="mb-3">
+              <input id="to-name" class="form-control" placeholder="Nom du client" />
+            </div>
+            <div class="mb-3">
+              <input id="to-address" class="form-control" placeholder="Adresse du client" />
+            </div>
+            <div>
+              <input id="to-contact" class="form-control" placeholder="Téléphone / Email" />
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="form-flex d-flex gap-3 flex-wrap mb-4">
+          <div style="min-width:180px;">
+            <label for="currency" class="fw-bold">💱 Devise</label>
+            <select id="currency" class="form-control">
+              <option value="USD">USD - Dollar US</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="XOF">XOF - Franc CFA</option>
+              <option value="CAD">CAD - Dollar Canadien</option>
+              <option value="GBP">GBP - Livre Sterling</option>
+            </select>
+          </div>
+
+          <div style="min-width:120px;">
+            <label for="tax-rate" class="fw-bold">% TVA</label>
+            <input id="tax-rate" class="form-control" type="number" min="0" step="0.01" value="16" />
+          </div>
+
+          <div style="min-width:180px;">
+            <label for="conversion-rate" class="fw-bold">💹 Taux de conversion</label>
+            <input id="conversion-rate" class="form-control" type="number" step="0.0001" placeholder="Rempli automatiquement" />
+          </div>
+        </div>
+
+        <h4 class="text-highlight mb-3">📦 Articles & Services</h4>
+        <table id="items-table" class="table table-striped">
+          <thead>
+            <tr>
+              <th style="text-align:left">Description</th>
+              <th style="width:80px">Qté</th>
+              <th style="width:120px">Prix</th>
+              <th style="width:120px">Total</th>
+              <th style="width:50px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="item-row">
+              <td><input class="item-desc form-control" value="Services Optiques" /></td>
+              <td><input class="item-qty form-control" type="number" min="0" step="1" value="1" /></td>
+              <td><input class="item-price form-control" type="number" min="0" step="0.01" value="500.00" /></td>
+              <td class="item-line-total">500.00</td>
+              <td><button class="btn-remove-line btn btn-sm btn-danger" type="button" aria-label="Supprimer la ligne">✕</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="mt-3">
+          <button id="btn-add-line" type="button" class="btn btn-premium">+ Ajouter une ligne</button>
+        </div>
+
+        <div class="mt-4">
+          <label for="notes" class="fw-bold">📝 Notes & Conditions</label>
+          <textarea id="notes" class="form-control" rows="4" placeholder="Conditions de paiement, remarques spéciales..."></textarea>
+        </div>
+
+        <div class="mt-4">
+          <h4 class="text-highlight mb-3">✍️ Signature Numérique</h4>
+          <div class="d-flex gap-3 align-items-start flex-wrap">
+            <canvas id="signature-pad" width="400" height="150" class="border rounded"></canvas>
+            <div class="d-flex flex-column gap-2">
+              <button id="btn-clear-sign" type="button" class="btn btn-outline-premium">🗑️ Effacer</button>
+              <input id="sig-upload" type="file" accept="image/*" class="form-control" />
+              <small class="text-muted">Ou importer une image de signature</small>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======= PREMIUM PREVIEW (RIGHT) ======= -->
+      <aside id="preview-section" class="premium-card">
+
+        <div id="preview-header" class="d-flex justify-content-between align-items-start mb-4">
+          <div>
+            <h2 id="preview-title" class="text-highlight">FACTURE</h2>
+            <div id="preview-from" class="text-body"></div>
+          </div>
+          <div class="text-end">
+            <img id="preview-logo" src="mandoptique.logo" alt="Logo MAND'OPTIQUE" class="logo-no-border" style="width:100px;height:100px;object-fit:contain;">
+            <div id="preview-meta" class="text-muted mt-2 fw-bold"></div>
+          </div>
+        </div>
+
+        <hr style="border-color: var(--accent);" />
+
+        <div id="preview-to" class="mb-4"></div>
+
+        <table id="preview-items" class="table table-striped">
+          <!-- injected by JS -->
+        </table>
+
+        <div id="preview-totals" class="mt-4 p-3 rounded" style="background: rgba(0, 123, 255, 0.1);"></div>
+
+        <div id="preview-notes" class="mt-4 p-3 rounded" style="background: rgba(255, 255, 255, 0.9);"></div>
+
+        <div id="preview-signature" class="mt-4 text-center">
+          <div class="border-top pt-3" style="border-color: var(--accent) !important;">
+            <p class="text-muted mb-2">Signature</p>
+            <canvas id="preview-signature-canvas" width="250" height="80" style="border: 1px dashed var(--accent); border-radius: 8px;"></canvas>
+          </div>
+        </div>
+
+        <footer class="mt-4 border-top pt-3 text-muted text-center" style="border-color: var(--accent) !important;">
+          Document premium généré par MANDO'TECH pour MAND'OPTIQUE
+        </footer>
+      </aside>
+
+    </main>
+
+    <!-- Document History Section -->
+    <section class="history-section">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h4 class="text-highlight">📚 Historique des Documents</h4>
+        <div class="d-flex gap-3 flex-wrap">
+          <input type="text" id="history-search" class="form-control" placeholder="Rechercher..." style="width: 200px;">
+          <button class="btn btn-outline-premium" id="btn-clear-history">
+            🗑️ Effacer l'historique
+          </button>
+        </div>
+      </div>
+      
+      <div id="history-list" class="row">
+        <!-- Documents will appear here -->
+      </div>
+    </section>
+
+    <!-- Cloud Storage Section -->
+    <section class="cloud-section">
+      <h4 class="text-highlight mb-4">☁️ Stockage Cloud Premium</h4>
+      
+      <div class="d-flex gap-3 mb-4 flex-wrap">
+        <select id="cloud-provider" class="form-select" style="min-width: 180px;">
+          <option value="">🌐 Choisir un fournisseur</option>
+          <option value="google_drive">📁 Google Drive</option>
+          <option value="dropbox">💾 Dropbox</option>
+        </select>
+        
+        <button id="btn-cloud-auth" class="btn btn-premium">
+          🔐 Connexion Cloud
+        </button>
+        
+        <button id="btn-save-cloud" class="btn btn-outline-premium" disabled>
+          💾 Sauvegarder sur Cloud
+        </button>
+        
+        <button id="btn-load-cloud" class="btn btn-outline-premium" disabled>
+          📂 Charger depuis Cloud
+        </button>
+      </div>
+      
+      <div id="cloud-files-list" class="mt-3">
+        <!-- Cloud files list -->
+      </div>
+    </section>
+
+    <!-- Import / Export JSON Premium -->
+    <section class="premium-card mt-4">
+      <h4 class="text-highlight mb-4">🔄 Import/Export Premium (JSON)</h4>
+      <div class="d-flex gap-3 align-items-center flex-wrap">
+        <button id="btn-export-json" type="button" class="btn btn-premium">📤 Exporter JSON</button>
+        <input id="import-json" type="file" accept="application/json" class="form-control" style="max-width:200px;" />
+        <small class="text-muted">Sauvegarde locale avancée & restauration</small>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Bottom Action Bar Premium -->
+  <div class="action-bar">
+    <div class="container">
+      <div class="action-buttons">
+        <button id="btn-save-local" type="button" class="btn btn-premium">💾 Sauvegarder</button>
+        <button id="btn-load-local" type="button" class="btn btn-outline-premium">📂 Charger</button>
+        <button id="btn-export-pdf" type="button" class="btn btn-premium">📄 Exporter PDF</button>
+        <button id="btn-share" type="button" class="btn btn-premium">📤 Partager</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    /* ========================
+       MANDO'TECH FACTURE PREMIUM
+       Version complète avec toutes les fonctionnalités
+       Développé par: MANDO'TECH
+       Client: MAND'OPTIQUE
+    ======================== */
+
+    // État global de l'application
+    const appState = {
+        document: {
+            type: 'Facture',
+            number: 'MOP-2024-001',
+            date: new Date().toISOString().split('T')[0],
+            currency: 'USD',
+            taxRate: 16,
+            conversionRate: null,
+            notes: ''
+        },
+        company: {
+            name: 'MAND\'OPTIQUE',
+            address: 'Local 7, Galerie Présidentielle, GOMBE - KINSHASA',
+            contact: '+243824796844, +243851729059 • www.mandoptique.com'
+        },
+        client: {
+            name: '',
+            address: '',
+            contact: ''
+        },
+        items: [
+            { description: 'Services Optiques', quantity: 1, price: 500.00 }
+        ],
+        signature: null,
+        theme: 'light'
+    };
+
+    /* ========================
+       MODÈLES PREMIUM
+    ======================== */
+    const documentTemplates = {
+        'invoice_web': {
+            name: 'Facture Services Web',
+            type: 'Facture',
+            items: [
+                { description: 'Développement de site web responsive', quantity: 1, price: 1200 },
+                { description: 'Hébergement premium annuel', quantity: 1, price: 300 },
+                { description: 'Maintenance et support mensuel', quantity: 12, price: 150 }
+            ],
+            notes: 'Paiement sous 30 jours. Support technique inclus pendant 1 an. Révisions illimitées pendant la phase de développement.',
+            taxRate: 20
+        },
+        'quote_consulting': {
+            name: 'Devis Conseil',
+            type: 'Devis',
+            items: [
+                { description: 'Audit technique complet', quantity: 1, price: 800 },
+                { description: 'Formation d\'équipe (par jour)', quantity: 3, price: 250 },
+                { description: 'Conseil stratégique', quantity: 5, price: 200 }
+            ],
+            notes: 'Validité du devis : 30 jours. Paiement : 50% à la commande, 50% à la livraison.',
+            taxRate: 20
+        },
+        'receipt_standard': {
+            name: 'Reçu de Paiement',
+            type: 'Reçu',
+            items: [
+                { description: 'Paiement reçu avec succès', quantity: 1, price: 0 }
+            ],
+            notes: 'Paiement reçu et confirmé. Merci pour votre confiance.',
+            taxRate: 0
+        }
+    };
+
+    /* ========================
+       GESTION DE L'HISTORIQUE DES DOCUMENTS
+    ======================== */
+    class DocumentHistory {
+        constructor() {
+            this.history = JSON.parse(localStorage.getItem('mandotech_history') || '[]');
+            this.maxEntries = 50;
+        }
+        
+        addDocument(documentData) {
+            const entry = {
+                id: Date.now().toString(),
+                timestamp: new Date().toISOString(),
+                title: `${documentData.docType} ${documentData.docNumber}`,
+                data: documentData,
+                preview: this.generatePreview(documentData)
+            };
+            
+            this.history.unshift(entry);
+            if (this.history.length > this.maxEntries) {
+                this.history = this.history.slice(0, this.maxEntries);
+            }
+            
+            this.save();
+            return entry;
+        }
+        
+        generatePreview(documentData) {
+            const subtotal = documentData.items.reduce((sum, item) => 
+                sum + (item.quantity * item.price), 0);
+            const total = subtotal * (1 + documentData.taxRate / 100);
+            
+            return {
+                from: documentData.fromName,
+                to: documentData.toName,
+                total: total,
+                itemsCount: documentData.items.length
+            };
+        }
+        
+        getHistory() {
+            return this.history;
+        }
+        
+        search(query) {
+            return this.history.filter(entry => 
+                entry.title.toLowerCase().includes(query.toLowerCase()) ||
+                entry.data.fromName.toLowerCase().includes(query.toLowerCase()) ||
+                entry.data.toName.toLowerCase().includes(query.toLowerCase())
+            );
+        }
+        
+        loadDocument(id) {
+            const entry = this.history.find(item => item.id === id);
+            return entry ? entry.data : null;
+        }
+        
+        deleteDocument(id) {
+            this.history = this.history.filter(item => item.id !== id);
+            this.save();
+        }
+        
+        save() {
+            localStorage.setItem('mandotech_history', JSON.stringify(this.history));
+        }
+    }
+
+    const documentHistory = new DocumentHistory();
+
+    /* ========================
+       SERVICE DE TAUX DE CHANGE
+    ======================== */
+    class ExchangeRateService {
+        constructor() {
+            this.cache = new Map();
+            this.cacheDuration = 3600000;
+        }
+        
+        async getExchangeRate(fromCurrency, toCurrency) {
+            const cacheKey = `${fromCurrency}_${toCurrency}`;
+            const cached = this.cache.get(cacheKey);
+            
+            if (cached && Date.now() - cached.timestamp < this.cacheDuration) {
+                return cached.rate;
+            }
+            
+            try {
+                const rate = await this.fetchExchangeRate(fromCurrency, toCurrency);
+                this.cache.set(cacheKey, {
+                    rate: rate,
+                    timestamp: Date.now()
+                });
+                return rate;
+            } catch (error) {
+                console.warn('Erreur de taux de change, utilisation du cache:', error);
+                return cached ? cached.rate : 1;
+            }
+        }
+        
+        async fetchExchangeRate(fromCurrency, toCurrency) {
+            if (fromCurrency === toCurrency) return 1;
+            
+            // Simulation - En production, utiliser une vraie API
+            const rates = {
+                'USD_EUR': 0.85,
+                'EUR_USD': 1.18,
+                'USD_XOF': 600,
+                'XOF_USD': 0.00167,
+                'EUR_XOF': 655,
+                'XOF_EUR': 0.00152
+            };
+            
+            const key = `${fromCurrency}_${toCurrency}`;
+            return rates[key] || 1;
+        }
+    }
+
+    const exchangeService = new ExchangeRateService();
+
+    /* ========================
+       GESTIONNAIRE HORS LIGNE
+    ======================== */
+    class OfflineManager {
+        constructor() {
+            this.isOnline = navigator.onLine;
+            this.init();
+        }
+        
+        init() {
+            window.addEventListener('online', () => {
+                this.isOnline = true;
+                this.updateOnlineStatus(true);
+                showNotification('🟢 Connexion rétablie', 'success');
+            });
+            
+            window.addEventListener('offline', () => {
+                this.isOnline = false;
+                this.updateOnlineStatus(false);
+                showNotification('🔴 Mode hors ligne activé', 'warning');
+            });
+            
+            this.updateOnlineStatus(this.isOnline);
+        }
+        
+        updateOnlineStatus(online) {
+            const statusElement = document.getElementById('online-status');
+            const syncElement = document.getElementById('sync-status');
+            
+            if (statusElement) {
+                statusElement.textContent = online ? '🟢 En ligne' : '🔴 Hors ligne';
+                statusElement.className = `status-badge ${online ? 'bg-success' : 'bg-danger'}`;
+            }
+            
+            if (syncElement) {
+                syncElement.textContent = online ? '✓ Synchronisé' : '⏳ En attente';
+                syncElement.className = `status-badge ${online ? 'bg-info' : 'bg-warning'}`;
+            }
+        }
+    }
+
+    const offlineManager = new OfflineManager();
+
+    /* ========================
+       FONCTIONS UTILITAIRES
+    ======================== */
+    function showNotification(message, type = 'info') {
+        // Implémentation simplifiée
+        console.log(`${type}: ${message}`);
+        if (type === 'success') {
+            alert(`✅ ${message}`);
+        } else if (type === 'error') {
+            alert(`❌ ${message}`);
+        } else {
+            alert(`ℹ️ ${message}`);
+        }
+    }
+
+    function getCurrentDocumentData() {
+        const items = Array.from(document.querySelectorAll('#items-table tbody tr')).map(row => ({
+            description: row.querySelector('.item-desc').value,
+            quantity: parseFloat(row.querySelector('.item-qty').value) || 0,
+            price: parseFloat(row.querySelector('.item-price').value) || 0
+        }));
+
+        return {
+            docType: document.getElementById('doc-type').value,
+            docNumber: document.getElementById('doc-number').value,
+            docDate: document.getElementById('doc-date').value,
+            fromName: document.getElementById('from-name').value,
+            fromAddress: document.getElementById('from-address').value,
+            fromContact: document.getElementById('from-contact').value,
+            toName: document.getElementById('to-name').value,
+            toAddress: document.getElementById('to-address').value,
+            toContact: document.getElementById('to-contact').value,
+            currency: document.getElementById('currency').value,
+            taxRate: parseFloat(document.getElementById('tax-rate').value) || 0,
+            conversionRate: parseFloat(document.getElementById('conversion-rate').value) || null,
+            notes: document.getElementById('notes').value,
+            items: items
+        };
+    }
+
+    function loadDocumentData(documentData) {
+        document.getElementById('doc-type').value = documentData.docType || 'Facture';
+        document.getElementById('doc-number').value = documentData.docNumber || 'MOP-2024-001';
+        document.getElementById('doc-date').value = documentData.docDate || '';
+        document.getElementById('to-name').value = documentData.toName || '';
+        document.getElementById('to-address').value = documentData.toAddress || '';
+        document.getElementById('to-contact').value = documentData.toContact || '';
+        document.getElementById('currency').value = documentData.currency || 'USD';
+        document.getElementById('tax-rate').value = documentData.taxRate || 16;
+        document.getElementById('conversion-rate').value = documentData.conversionRate || '';
+        document.getElementById('notes').value = documentData.notes || '';
+
+        const tbody = document.querySelector('#items-table tbody');
+        tbody.innerHTML = '';
+        
+        if (documentData.items && documentData.items.length > 0) {
+            documentData.items.forEach(item => {
+                addItemRow(item.description, item.quantity, item.price);
+            });
+        } else {
+            addItemRow('Services Optiques', 1, 500.00);
+        }
+        
+        updatePreview();
+    }
+
+    /* ========================
+       ÉCRAN D'INTRODUCTION NEON
+    ======================== */
+    const introScreen = document.getElementById('intro-screen');
+    const app = document.getElementById('app');
+    const neonText = document.getElementById('neon-text');
+
+    let introTime = 0;
+    const introInterval = setInterval(()=>{
+        introTime += 50;
+        if(introTime >= 8000){
+            clearInterval(introInterval);
+            introScreen.style.display = 'none';
+            app.style.display = 'block';
+            app.setAttribute('aria-hidden', 'false');
+        }
+    },50);
+
+    /* ========================
+       GESTION DES THÈMES PREMIUM
+    ======================== */
+    const colorThemes = {
+      light: {
+        '--bg-primary': '#ffffff',
+        '--bg-secondary': '#f8f9fa',
+        '--bg-card': '#ffffff',
+        '--text-primary': '#212529',
+        '--text-secondary': '#495057',
+        '--text-muted': '#6c757d',
+        '--accent': '#007bff',
+        '--accent-hover': '#0056b3',
+        '--accent-glow': '0 0 10px rgba(0, 123, 255, 0.2)',
+        '--border': '#dee2e6',
+        '--shadow': 'rgba(0, 0, 0, 0.1)',
+        '--gradient-primary': 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)',
+        '--gradient-secondary': 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
+      },
+      dark: {
+        '--bg-primary': '#0f1724',
+        '--bg-secondary': '#1e293b',
+        '--bg-card': '#1e293b',
+        '--text-primary': '#f8fafc',
+        '--text-secondary': '#cbd5e1',
+        '--text-muted': '#64748b',
+        '--accent': '#00d5ff',
+        '--accent-hover': '#00aabb',
+        '--accent-glow': '0 0 20px rgba(0, 213, 255, 0.4)',
+        '--border': '#334155',
+        '--shadow': 'rgba(0, 0, 0, 0.3)',
+        '--gradient-primary': 'linear-gradient(135deg, #00d5ff 0%, #0099cc 100%)',
+        '--gradient-secondary': 'linear-gradient(135deg, #1e293b 0%, #0f1724 100%)'
+      },
+      blue: {
+        '--bg-primary': '#0c4a6e',
+        '--bg-secondary': '#0369a1',
+        '--bg-card': '#0ea5e9',
+        '--text-primary': '#f0f9ff',
+        '--text-secondary': '#bae6fd',
+        '--text-muted': '#7dd3fc',
+        '--accent': '#38bdf8',
+        '--accent-hover': '#0ea5e9',
+        '--accent-glow': '0 0 20px rgba(56, 189, 248, 0.4)',
+        '--border': '#7dd3fc',
+        '--shadow': 'rgba(2, 132, 199, 0.3)',
+        '--gradient-primary': 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)',
+        '--gradient-secondary': 'linear-gradient(135deg, #0369a1 0%, #0c4a6e 100%)'
+      },
+      purple: {
+        '--bg-primary': '#4c1d95',
+        '--bg-secondary': '#6d28d9',
+        '--bg-card': '#8b5cf6',
+        '--text-primary': '#faf5ff',
+        '--text-secondary': '#e9d5ff',
+        '--text-muted': '#c4b5fd',
+        '--accent': '#a855f7',
+        '--accent-hover': '#9333ea',
+        '--accent-glow': '0 0 20px rgba(168, 85, 247, 0.4)',
+        '--border': '#c4b5fd',
+        '--shadow': 'rgba(124, 58, 237, 0.3)',
+        '--gradient-primary': 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+        '--gradient-secondary': 'linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%)'
+      },
+      green: {
+        '--bg-primary': '#065f46',
+        '--bg-secondary': '#047857',
+        '--bg-card': '#10b981',
+        '--text-primary': '#ecfdf5',
+        '--text-secondary': '#a7f3d0',
+        '--text-muted': '#6ee7b7',
+        '--accent': '#34d399',
+        '--accent-hover': '#10b981',
+        '--accent-glow': '0 0 20px rgba(52, 211, 153, 0.4)',
+        '--border': '#6ee7b7',
+        '--shadow': 'rgba(16, 185, 129, 0.3)',
+        '--gradient-primary': 'linear-gradient(135deg, #34d399 0%, #10b981 100%)',
+        '--gradient-secondary': 'linear-gradient(135deg, #047857 0%, #065f46 100%)'
+      },
+      warm: {
+        '--bg-primary': '#92400e',
+        '--bg-secondary': '#b45309',
+        '--bg-card': '#f59e0b',
+        '--text-primary': '#fffbeb',
+        '--text-secondary': '#fef3c7',
+        '--text-muted': '#fde68a',
+        '--accent': '#fbbf24',
+        '--accent-hover': '#f59e0b',
+        '--accent-glow': '0 0 20px rgba(251, 191, 36, 0.4)',
+        '--border': '#fde68a',
+        '--shadow': 'rgba(245, 158, 11, 0.3)',
+        '--gradient-primary': 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+        '--gradient-secondary': 'linear-gradient(135deg, #b45309 0%, #92400e 100%)'
+      }
+    };
+
+    function applyTheme(themeName) {
+      const theme = colorThemes[themeName];
+      if (!theme) return;
+      
+      for (const [property, value] of Object.entries(theme)) {
+        document.documentElement.style.setProperty(property, value);
+      }
+      
+      document.querySelectorAll('.color-option').forEach(option => {
+        option.classList.remove('active');
+        if (option.dataset.theme === themeName) {
+          option.classList.add('active');
+        }
+      });
+      
+      localStorage.setItem('mandotech_theme', themeName);
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('mandotech_theme') || 'light';
+      applyTheme(savedTheme);
+    }
+
+    /* ========================
+       FONCTIONS DE CALCUL
+    ======================== */
+    function calculateLineTotal(row) {
+        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        const total = qty * price;
+        row.querySelector('.item-line-total').textContent = total.toFixed(2);
+        return total;
+    }
+
+    function updateAllLineTotals() {
+        const rows = document.querySelectorAll('#items-table tbody tr');
+        let subtotal = 0;
+        
+        rows.forEach(row => {
+            subtotal += calculateLineTotal(row);
+        });
+        
+        updatePreview();
+    }
+
+    /* ========================
+       FONCTIONNALITÉS PRINCIPALES
+    ======================== */
+    function updatePreview() {
+        const title = document.getElementById('doc-type').value;
+        document.getElementById('preview-title').innerText = title;
+
+        const from = `<strong>De :</strong> ${document.getElementById('from-name').value}<br>${document.getElementById('from-address').value}<br>${document.getElementById('from-contact').value}`;
+        document.getElementById('preview-from').innerHTML = from;
+
+        const to = `<strong>À :</strong> ${document.getElementById('to-name').value}<br>${document.getElementById('to-address').value}<br>${document.getElementById('to-contact').value}`;
+        document.getElementById('preview-to').innerHTML = to;
+
+        const table = document.getElementById('items-table').querySelector('tbody');
+        const previewTable = document.getElementById('preview-items');
+        previewTable.innerHTML = "";
+        let total = 0;
+        
+        previewTable.innerHTML = `
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Qté</th>
+              <th>Prix</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+        `;
+        
+        table.querySelectorAll('tr').forEach(row=>{
+            const desc = row.querySelector('.item-desc').value;
+            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+            const lineTotal = qty * price;
+            total += lineTotal;
+            
+            previewTable.innerHTML += `
+              <tr>
+                <td>${desc}</td>
+                <td>${qty}</td>
+                <td>${price.toFixed(2)}</td>
+                <td>${lineTotal.toFixed(2)}</td>
+              </tr>
+            `;
+        });
+        
+        previewTable.innerHTML += '</tbody>';
+
+        const taxRate = parseFloat(document.getElementById('tax-rate').value) || 0;
+        const vatAmount = total * (taxRate/100);
+        const finalTotal = total + vatAmount;
+        
+        document.getElementById('preview-totals').innerHTML = `
+            <p><strong>Sous-total :</strong> ${total.toFixed(2)}</p>
+            <p><strong>TVA (${taxRate}%) :</strong> ${vatAmount.toFixed(2)}</p>
+            <h4 class="text-highlight">Total : ${finalTotal.toFixed(2)}</h4>`;
+            
+        const docNumber = document.getElementById('doc-number').value;
+        const docDate = document.getElementById('doc-date').value;
+        document.getElementById('preview-meta').innerHTML = `
+            <strong>N° :</strong> ${docNumber}<br>
+            <strong>Date :</strong> ${docDate}
+        `;
+        
+        const notes = document.getElementById('notes').value;
+        document.getElementById('preview-notes').innerHTML = notes ? `<strong>Notes :</strong><br>${notes}` : '';
+        
+        updateSignaturePreview();
+    }
+
+    function updateSignaturePreview() {
+        const previewCanvas = document.getElementById('preview-signature-canvas');
+        const previewCtx = previewCanvas.getContext('2d');
+        const mainCanvas = document.getElementById('signature-pad');
+        
+        previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+        previewCtx.drawImage(mainCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
+    }
+
+    function addItemRow(description = '', quantity = 1, price = 0) {
+        const tbody = document.querySelector('#items-table tbody');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><input class="item-desc form-control" value="${description}"/></td>
+            <td><input class="item-qty form-control" type="number" min="0" value="${quantity}"/></td>
+            <td><input class="item-price form-control" type="number" min="0" step="0.01" value="${price}"/></td>
+            <td class="item-line-total">${(quantity * price).toFixed(2)}</td>
+            <td><button class="btn-remove-line btn btn-sm btn-danger">✕</button></td>
+        `;
+        tbody.appendChild(row);
+        
+        // Ajouter les écouteurs d'événements pour les calculs
+        row.querySelector('.item-qty').addEventListener('input', () => {
+            calculateLineTotal(row);
+            updatePreview();
+        });
+        
+        row.querySelector('.item-price').addEventListener('input', () => {
+            calculateLineTotal(row);
+            updatePreview();
+        });
+        
+        row.querySelector('.btn-remove-line').onclick = () => {
+            row.remove();
+            updatePreview();
+        };
+    }
+
+    function loadTemplate(templateKey) {
+        const template = documentTemplates[templateKey];
+        if (!template) return;
+        
+        document.getElementById('doc-type').value = template.type;
+        document.getElementById('tax-rate').value = template.taxRate;
+        document.getElementById('notes').value = template.notes;
+        
+        const tbody = document.querySelector('#items-table tbody');
+        tbody.innerHTML = '';
+        
+        template.items.forEach(item => {
+            addItemRow(item.description, item.quantity, item.price);
+        });
+        
+        updatePreview();
+        showNotification(`Modèle "${template.name}" chargé`, 'success');
+    }
+
+    function renderHistory() {
+        const historyList = document.getElementById('history-list');
+        const history = documentHistory.getHistory();
+        
+        if (history.length === 0) {
+            historyList.innerHTML = `
+                <div class="col-12 text-center text-muted py-5">
+                    <h5>📭 Aucun document dans l'historique</h5>
+                    <p class="mb-0">Vos documents apparaîtront ici après sauvegarde</p>
+                </div>
+            `;
+            return;
+        }
+        
+        historyList.innerHTML = history.map(entry => `
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card history-card h-100">
+                    <div class="card-body">
+                        <h6 class="card-title text-highlight">${entry.title}</h6>
+                        <p class="card-text small text-muted">
+                            <strong>De :</strong> ${entry.preview.from}<br>
+                            <strong>À :</strong> ${entry.preview.to}<br>
+                            <strong>Total :</strong> $${entry.preview.total.toFixed(2)}<br>
+                            <strong>Articles :</strong> ${entry.preview.itemsCount}
+                        </p>
+                        <small class="text-muted">
+                            ${new Date(entry.timestamp).toLocaleDateString('fr-FR')} à ${new Date(entry.timestamp).toLocaleTimeString('fr-FR')}
+                        </small>
+                    </div>
+                    <div class="card-footer bg-transparent d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-premium load-history flex-fill" data-id="${entry.id}">
+                            📂 Charger
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger delete-history" data-id="${entry.id}" title="Supprimer">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.load-history').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                const documentData = documentHistory.loadDocument(id);
+                if (documentData) {
+                    loadDocumentData(documentData);
+                    showNotification('Document chargé depuis l\'historique', 'success');
+                }
+            });
+        });
+        
+        document.querySelectorAll('.delete-history').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.target.dataset.id;
+                if (confirm('Supprimer ce document de l\'historique ?')) {
+                    documentHistory.deleteDocument(id);
+                    renderHistory();
+                    showNotification('Document supprimé de l\'historique', 'info');
+                }
+            });
+        });
+    }
+
+    /* ========================
+       PAD DE SIGNATURE PREMIUM
+    ======================== */
+    const sigPad = document.getElementById('signature-pad');
+    const sigCtx = sigPad.getContext('2d');
+    let drawing = false;
+
+    function startDrawing(e) {
+        drawing = true;
+        const rect = sigPad.getBoundingClientRect();
+        sigCtx.beginPath();
+        sigCtx.moveTo(
+            e.clientX - rect.left,
+            e.clientY - rect.top
+        );
+    }
+
+    function draw(e) {
+        if (!drawing) return;
+        
+        const rect = sigPad.getBoundingClientRect();
+        sigCtx.lineWidth = 3;
+        sigCtx.lineCap = 'round';
+        sigCtx.lineJoin = 'round';
+        sigCtx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+        
+        sigCtx.lineTo(
+            e.clientX - rect.left,
+            e.clientY - rect.top
+        );
+        sigCtx.stroke();
+    }
+
+    function stopDrawing() {
+        drawing = false;
+        sigCtx.beginPath();
+        updateSignaturePreview();
+    }
+
+    // Événements souris
+    sigPad.addEventListener('mousedown', startDrawing);
+    sigPad.addEventListener('mouseup', stopDrawing);
+    sigPad.addEventListener('mouseout', stopDrawing);
+    sigPad.addEventListener('mousemove', draw);
+
+    // Événements tactiles
+    sigPad.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousedown', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        sigPad.dispatchEvent(mouseEvent);
+    });
+    
+    sigPad.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousemove', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        sigPad.dispatchEvent(mouseEvent);
+    });
+    
+    sigPad.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        const mouseEvent = new MouseEvent('mouseup', {});
+        sigPad.dispatchEvent(mouseEvent);
+    });
+
+    document.getElementById('btn-clear-sign').onclick = ()=>{
+        sigCtx.clearRect(0,0,sigPad.width,sigPad.height);
+        updateSignaturePreview();
+    };
+
+    /* ========================
+       ÉVÉNEMENTS PRINCIPAUX
+    ======================== */
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialisation
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('doc-date').value = today;
+        
+        initTheme();
+        
+        // Événements de base
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', () => {
+                applyTheme(option.dataset.theme);
+            });
+        });
+
+        document.getElementById('apply-custom-color').addEventListener('click', () => {
+            const customColor = document.getElementById('custom-color').value;
+            document.documentElement.style.setProperty('--accent', customColor);
+            document.documentElement.style.setProperty('--accent-hover', customColor);
+            localStorage.setItem('mandotech_theme', 'custom');
+            localStorage.setItem('mandotech_custom_color', customColor);
+            showNotification('Couleur personnalisée appliquée', 'success');
+        });
+
+        // Modèles
+        document.querySelectorAll('.template-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const templateKey = e.target.dataset.template;
+                loadTemplate(templateKey);
+            });
+        });
+
+        document.getElementById('btn-save-template').addEventListener('click', () => {
+            const templateName = prompt('Nom du modèle :');
+            if (templateName) {
+                const items = Array.from(document.querySelectorAll('#items-table tbody tr')).map(row => ({
+                    description: row.querySelector('.item-desc').value,
+                    quantity: parseFloat(row.querySelector('.item-qty').value),
+                    price: parseFloat(row.querySelector('.item-price').value)
+                }));
+                
+                const newTemplate = {
+                    name: templateName,
+                    type: document.getElementById('doc-type').value,
+                    items: items,
+                    notes: document.getElementById('notes').value,
+                    taxRate: parseFloat(document.getElementById('tax-rate').value)
+                };
+                
+                const savedTemplates = JSON.parse(localStorage.getItem('mandotech_templates') || '{}');
+                const templateKey = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                savedTemplates[templateKey] = newTemplate;
+                localStorage.setItem('mandotech_templates', JSON.stringify(savedTemplates));
+                
+                showNotification(`Modèle "${templateName}" sauvegardé`, 'success');
+            }
+        });
+
+        // Historique
+        document.getElementById('history-search').addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query) {
+                const results = documentHistory.search(query);
+                if (results.length > 0) {
+                    const historyList = document.getElementById('history-list');
+                    historyList.innerHTML = results.map(entry => `
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card history-card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title text-highlight">${entry.title}</h6>
+                                    <p class="card-text small text-muted">
+                                        De : ${entry.preview.from}<br>
+                                        À : ${entry.preview.to}<br>
+                                        Total : $${entry.preview.total.toFixed(2)}
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <button class="btn btn-sm btn-outline-premium load-history w-100" data-id="${entry.id}">
+                                        Charger
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    document.querySelectorAll('.load-history').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.target.dataset.id;
+                            const documentData = documentHistory.loadDocument(id);
+                            if (documentData) {
+                                loadDocumentData(documentData);
+                                showNotification('Document chargé depuis la recherche', 'success');
+                            }
+                        });
+                    });
+                } else {
+                    document.getElementById('history-list').innerHTML = `
+                        <div class="col-12 text-center text-muted py-4">
+                            <p>Aucun résultat trouvé pour "${query}"</p>
+                        </div>
+                    `;
+                }
+            } else {
+                renderHistory();
+            }
+        });
+
+        document.getElementById('btn-clear-history').addEventListener('click', () => {
+            if (confirm('Effacer tout l\'historique ? Cette action est irréversible.')) {
+                localStorage.removeItem('mandotech_history');
+                renderHistory();
+                showNotification('Historique effacé', 'info');
+            }
+        });
+
+        // Événements du formulaire
+        document.getElementById('btn-add-line').onclick = () => addItemRow('Nouveau service', 1, 0);
+        
+        // Ajouter les écouteurs d'événements aux lignes existantes
+        document.querySelectorAll('#items-table tbody tr').forEach(row => {
+            row.querySelector('.item-qty').addEventListener('input', () => {
+                calculateLineTotal(row);
+                updatePreview();
+            });
+            
+            row.querySelector('.item-price').addEventListener('input', () => {
+                calculateLineTotal(row);
+                updatePreview();
+            });
+            
+            row.querySelector('.btn-remove-line').onclick = e => {
+                const row = e.target.closest('tr');
+                row.remove();
+                updatePreview();
+            };
+        });
+
+        // Mise à jour automatique de l'aperçu
+        const updateElements = [
+            'doc-type', 'from-name', 'from-address', 'from-contact', 
+            'to-name', 'to-address', 'to-contact', 'tax-rate', 
+            'doc-number', 'doc-date', 'notes', 'currency'
+        ];
+        
+        updateElements.forEach(id => {
+            document.getElementById(id).addEventListener('input', updatePreview);
+        });
+
+        // Conversion automatique de devise
+        document.getElementById('currency').addEventListener('change', async function() {
+            const baseCurrency = this.value;
+            if (baseCurrency !== 'USD') {
+                try {
+                    const rate = await exchangeService.getExchangeRate('USD', baseCurrency);
+                    document.getElementById('conversion-rate').value = rate.toFixed(4);
+                    updatePreview();
+                } catch (error) {
+                    console.warn('Impossible de récupérer le taux de change');
+                }
+            }
+        });
+
+        updatePreview();
+        renderHistory();
+    });
+
+    /* ========================
+       FONCTIONNALITÉS D'EXPORTATION
+    ======================== */
+    async function exportPDF() {
+        const documentData = getCurrentDocumentData();
+        documentHistory.addDocument(documentData);
+        renderHistory();
+        
+        const preview = document.getElementById('preview-section');
+        const canvas = await html2canvas(preview, {scale: 2});
+        const img = canvas.toDataURL('image/png');
+        const pdf = new jspdf.jsPDF('p','mm','a4');
+        const width = pdf.internal.pageSize.getWidth();
+        const height = canvas.height * width / canvas.width;
+        pdf.addImage(img, 'PNG', 0, 0, width, height);
+        pdf.save(`MAND'OPTIQUE-${documentData.docNumber}.pdf`);
+        showNotification('PDF exporté avec succès', 'success');
+    }
+
+    document.getElementById('btn-export-pdf').onclick = exportPDF;
+
+    document.getElementById('btn-share').onclick = async ()=>{
+        const preview = document.getElementById('preview-section');
+        const canvas = await html2canvas(preview);
+        canvas.toBlob(blob => {
+            const file = new File([blob], 'MAND\'OPTIQUE-Document.png', {type: 'image/png'});
+            if(navigator.canShare && navigator.canShare({files:[file]})){
+                navigator.share({
+                    title: 'MAND\'OPTIQUE - Document',
+                    files: [file]
+                });
+            } else {
+                showNotification('Partage non supporté sur cet appareil', 'warning');
+            }
+        });
+    };
+
+    document.getElementById('btn-save-local').onclick = ()=>{
+        const data = getCurrentDocumentData();
+        localStorage.setItem('mandotech_doc', JSON.stringify(data));
+        documentHistory.addDocument(data);
+        renderHistory();
+        showNotification('Document sauvegardé localement', 'success');
+    };
+
+    document.getElementById('btn-load-local').onclick = ()=>{
+        const data = JSON.parse(localStorage.getItem('mandotech_doc'));
+        if(!data){ 
+            showNotification('Aucune sauvegarde trouvée', 'warning'); 
+            return;
+        }
+        loadDocumentData(data);
+        showNotification('Document chargé', 'success');
+    };
+
+    document.getElementById('btn-export-json').onclick = () => {
+        const data = getCurrentDocumentData();
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(dataBlob);
+        a.download = `mandoptique-${data.docNumber}.json`;
+        a.click();
+        showNotification('JSON exporté avec succès', 'success');
+    };
+
+    document.getElementById('import-json').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const data = JSON.parse(event.target.result);
+                loadDocumentData(data);
+                showNotification('Document importé avec succès', 'success');
+            } catch (error) {
+                showNotification('Erreur lors de l\'importation du fichier JSON', 'error');
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    };
+
+    // Stockage Cloud (interface seulement pour le moment)
+    document.getElementById('btn-cloud-auth').addEventListener('click', () => {
+        showNotification('Fonctionnalité cloud en développement', 'info');
+    });
+
+    document.getElementById('btn-save-cloud').addEventListener('click', () => {
+        showNotification('Sauvegarde cloud en développement', 'info');
+    });
+
+    document.getElementById('btn-load-cloud').addEventListener('click', () => {
+        showNotification('Chargement cloud en développement', 'info');
+    });
+
+  </script>
+</body>
+</html>
